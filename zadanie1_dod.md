@@ -1,10 +1,9 @@
 
 # Zadanie dodatkowe (2)
 
-## 0. Sprawdzenie obrazu na zagrozenia
+## **0. Sprawdzenie obrazu na zagrozenia**
 ```
 docker scout cves --only-severity critical,high weather-app
-
 ```
 
 ### Wynik
@@ -21,7 +20,7 @@ docker scout cves --only-severity critical,high weather-app
     packages        │ 19
 ```
 
-## 1. **Skrypt budujący obraz multiarch **
+## 1. **Skrypt budujący obraz multiarch**
 
 ```
 # Parametry konfiguracyjne
