@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Weather App</title>
+  </head>
+  <body>
+    <h1>Weather:</h1>
+
+    <label for="country">Select Country:</label>
+    <select id="country" onchange="updateCities()">
+      <option value="">-- Select Country --</option>
+      <option value="United States">United States</option>
+      <option value="United Kingdom">United Kingdom</option>
+      <option value="Japan">Japan</option>
+    </select>
+
+    <label for="city">Select City:</label>
+    <select id="city">
+      <option value="">-- Select City --</option>
+    </select>
+
+    <button onclick="fetchWeather()">Get Weather</button>
+
+    <h2 id="result"></h2>
+
+    <script>
+      const citiesByCountry = {
+        "United States": ["New York", "Los Angeles", "Chicago"],
+        "United Kingdom": ["London", "Manchester", "Birmingham"],
+        Japan: ["Tokyo", "Osaka", "Kyoto"],
+      };
+
+      function updateCities() {
+        const country = document.getElementById("country").value;
+        const citySelect = document.getElementById("city");
+
+        citySelect.innerHTML = '<option value="">-- Select City --</option>';
+
+        if (country && citiesByCountry[country]) {
+          citiesByCountry[country].forEach((city) => {
+            const option = document.createElement("option");
+            option.value = city;
+            option.textContent = city;
+            citySelect.appendChild(option);
+          });
+        }
+      }
+
+      function fetchWeather() {
+        const country = document.getElementById("country").value;
+        const city = document.getElementById("city").value;
+
+        if (!country || !city) {
+          document.getElementById("result").innerText =
+            "Please select both country and city.";
+          return;
+        }
+
+        const query = `${city}, ${country}`;
+        fetch(
+          `http://api.weatherstack.com/current?access_key=5b7e87c1478b7aec9b3f06d26f80e90b&query=${encodeURIComponent(
+            query
+          )}`
+        )
+          .then((response) => response.json())
+          .then((data) => {
+            if (data.success === false) {
+              document.getElementById(
+                "result"
+              ).innerText = `Error: ${data.error.info}`;
+              return;
+            }
+            document.getElementById("result").innerHTML = `
+              City: ${data.location.name}<br>
+              Country: ${data.location.country}<br>
+              Temperature: ${data.current.temperature}°C<br>
+              Description: ${data.current.weather_descriptions.join(", ")}
+            `;
+          })
+          .catch((err) => {
+            document.getElementById("result").innerText =
+              "Error fetching weather.";
+          });
+      }
+    </script>
+  </body>
+</html>
