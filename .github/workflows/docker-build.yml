@@ -50,33 +50,35 @@ jobs:
             type=ref,event=branch
             type=sha
 
-      # Single-platform build (only for scanning)
-      - name: Build image for CVE scan (amd64 only)
+      # ✅ Build single-platform image for scan (amd64 only)
+      - name: Build image for Trivy scan (amd64 only)
         uses: docker/build-push-action@v5
         with:
           context: .
           platforms: linux/amd64
           load: true
-          tags: ${{ steps.meta.outputs.tags }}
+          tags: ${{ env.IMAGE_NAME }}:main
           cache-from: type=registry,ref=${{ env.CACHE_REPO }}:cache
           cache-to: type=registry,ref=${{ env.CACHE_REPO }}:cache,mode=max
 
+      # ✅ Scan single-platform image for critical/high vulnerabilities
       - name: Scan image for CVEs (critical/high)
         uses: aquasecurity/trivy-action@0.11.2
         with:
-          image-ref: ${{ steps.meta.outputs.tags }}
+          image-ref: ${{ env.IMAGE_NAME }}:main
           format: "table"
           exit-code: "1"
           severity: "CRITICAL,HIGH"
 
-      # Multi-platform build & push
-      - name: Build and push multi-arch image (to GHCR)
+      # ✅ Build and push multi-arch image to GHCR
+      - name: Build and push multi-arch image
         if: success()
         uses: docker/build-push-action@v5
         with:
           context: .
           platforms: linux/amd64,linux/arm64
           push: true
-          tags: ${{ steps.meta.outputs.tags }}
+          tags: |
+            ${{ steps.meta.outputs.tags }}
           cache-from: type=registry,ref=${{ env.CACHE_REPO }}:cache
           cache-to: type=registry,ref=${{ env.CACHE_REPO }}:cache,mode=max
