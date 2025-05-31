@@ -6,7 +6,8 @@ on:
       - main
 
 env:
-  IMAGE_NAME: ghcr.io/${{ github.repository }}
+  # ✅ Poprawiona nazwa obrazu (lowercase)
+  IMAGE_NAME: ghcr.io/vladyslav-crunch/pawcho_lab_obw
   CACHE_REPO: docker.io/nerocrunch/cache
 
 jobs:
@@ -45,12 +46,13 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: ${{ env.IMAGE_NAME }}
+          # ✅ Ręcznie ustawiona poprawna nazwa obrazu
+          images: ghcr.io/vladyslav-crunch/pawcho_lab_obw
           tags: |
             type=ref,event=branch
             type=sha
 
-      # ✅ Build single-platform image for scan (amd64 only)
+      # ✅ Build single-platform image for scan (amd64)
       - name: Build image for Trivy scan (amd64 only)
         uses: docker/build-push-action@v5
         with:
@@ -61,7 +63,7 @@ jobs:
           cache-from: type=registry,ref=${{ env.CACHE_REPO }}:cache
           cache-to: type=registry,ref=${{ env.CACHE_REPO }}:cache,mode=max
 
-      # ✅ Scan single-platform image for critical/high vulnerabilities
+      # ✅ Scan image with Trivy
       - name: Scan image for CVEs (critical/high)
         uses: aquasecurity/trivy-action@0.11.2
         with:
@@ -70,7 +72,7 @@ jobs:
           exit-code: "1"
           severity: "CRITICAL,HIGH"
 
-      # ✅ Build and push multi-arch image to GHCR
+      # ✅ Build and push multi-platform image (only if scan passed)
       - name: Build and push multi-arch image
         if: success()
         uses: docker/build-push-action@v5
@@ -78,7 +80,6 @@ jobs:
           context: .
           platforms: linux/amd64,linux/arm64
           push: true
-          tags: |
-            ${{ steps.meta.outputs.tags }}
+          tags: ${{ steps.meta.outputs.tags }}
           cache-from: type=registry,ref=${{ env.CACHE_REPO }}:cache
           cache-to: type=registry,ref=${{ env.CACHE_REPO }}:cache,mode=max
