@@ -6,7 +6,6 @@ on:
       - main
 
 env:
-  # ✅ Poprawiona nazwa obrazu (lowercase)
   IMAGE_NAME: ghcr.io/vladyslav-crunch/pawcho_lab_obw
   CACHE_REPO: docker.io/nerocrunch/cache
 
@@ -46,13 +45,11 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          # ✅ Ręcznie ustawiona poprawna nazwa obrazu
           images: ghcr.io/vladyslav-crunch/pawcho_lab_obw
           tags: |
             type=ref,event=branch
             type=sha
 
-      # ✅ Build single-platform image for scan (amd64)
       - name: Build image for Trivy scan (amd64 only)
         uses: docker/build-push-action@v5
         with:
@@ -63,7 +60,6 @@ jobs:
           cache-from: type=registry,ref=${{ env.CACHE_REPO }}:cache
           cache-to: type=registry,ref=${{ env.CACHE_REPO }}:cache,mode=max
 
-      # ✅ Scan image with Trivy
       - name: Scan image for CVEs (critical/high)
         uses: aquasecurity/trivy-action@0.11.2
         with:
@@ -72,7 +68,6 @@ jobs:
           exit-code: "1"
           severity: "CRITICAL,HIGH"
 
-      # ✅ Build and push multi-platform image (only if scan passed)
       - name: Build and push multi-arch image
         if: success()
         uses: docker/build-push-action@v5
