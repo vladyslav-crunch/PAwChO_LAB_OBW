@@ -104,7 +104,7 @@ HTML zawiera:
 </body>
 </html>
 ```
-
+![Alt Text](./images/Browser.png)
 ### 🔸 Backend w Go (`main.go`)
 
 Serwer HTTP w Go hostuje statyczne pliki oraz posiada endpoint `/healthcheck`.
