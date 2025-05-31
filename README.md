@@ -1,4 +1,4 @@
-# 🐳 LAB 2  
+# 🐳 Zadanie 2  
 
 ## Cel zadania
 
